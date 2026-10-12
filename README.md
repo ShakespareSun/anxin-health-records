@@ -148,6 +148,7 @@ pnpm build
 
 ```text
 src/                       React 页面、趋势图与指标分类
+vite.config.js             构建配置，避免当前依赖的高内存摇树分析
 app.py                     HTTP 接口、登录和导出
 store.py                   SQLite 与原件归档
 ocr_worker.py              本地 OCR 队列
