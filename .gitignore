@@ -1,0 +1,44 @@
+.venv/
+node_modules/
+data/
+dist/
+__pycache__/
+.pytest_cache/
+*.log
+
+# 原始病历、整理结果与备份只保存在本机
+*.pdf
+*.health
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite-*
+*.csv
+data-before-restore*/
+backups/
+exports/
+screenshots/
+首批整理结果.md
+现有病历分析报告.md
+qa_preview.py
+
+# 本机快捷方式、账户凭据和配置
+*.lnk
+.env
+.env.*
+!.env.example
+private/
+secrets/
+*credentials*.json
+*.pem
+*.key
+
+# 临时文件及编辑器缓存
+*.tmp
+*.pyc
+*.pyo
+.coverage
+htmlcov/
+.vscode/
+.idea/

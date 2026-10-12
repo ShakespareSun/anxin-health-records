@@ -1,0 +1,13 @@
+import React from 'react';
+
+export function AnswerText({text,reports,open}){
+ function cited(line){return line.split(/(\[R\d+\])/).map((part,i)=>{let id=/^\[R(\d+)\]$/.exec(part)?.[1],r=reports.find(r=>r.id===+id);return r?<button className="citation" key={i} onClick={()=>open(r)}>原文·第{r.number}页</button>:<React.Fragment key={i}>{part.replace(/\*\*/g,'')}</React.Fragment>})}
+ return <div className="answer-text">{text.split('\n').map((line,i)=>/^#{1,4}\s/.test(line)?<h3 key={i}>{cited(line.replace(/^#{1,4}\s/,''))}</h3>:<p key={i}>{cited(line)}</p>)}</div>
+}
+
+export default function AnalysisPanel({data,open,ask}){
+ const a=data.analysis;if(!a)return null;
+ return <><section className="analysis-overview"><div className="section-title"><div><span className="pill">AI 辅助病历解读</span><h2>{a.title}</h2></div><button onClick={ask}>基于病历继续提问 ↗</button></div><p className="analysis-date">资料截至 {a.data_through||'尚未确认'} · 使用 {a.confirmed_count} 条已核对记录 · {a.pending_count} 条待核对</p><div className="analysis-summary">{a.summary.map((s,i)=><p key={s}><b>{i+1}</b>{s}</p>)}</div><p className="analysis-limit">解读依据现有资料与权威医学资料；诊断、分期和治疗由接诊医生确认。</p></section>
+ {data.ai_analysis&&<section className="ai-report"><div className="section-title"><h2>大模型深入分析</h2><span className="pill">{data.ai_analysis.stale?'资料已更新 · 旧版解读':'基于当前资料'}</span></div><p className="muted">{data.ai_analysis.model} · {new Date(data.ai_analysis.at).toLocaleString('zh-CN')} · AI 生成，尚未经医生审核</p>{data.ai_analysis.stale&&<p className="error">这份深入分析之后病历发生了变化。请参考下方当前资料解读，或在病历问答重新生成。</p>}<AnswerText text={data.ai_analysis.content} reports={data.reports} open={open}/></section>}
+ <div className="analysis-cards">{a.cards.map((c,i)=><section key={c.key} className={'analysis-card '+(i===0?'first':'')}><div className="analysis-card-title"><span>{String(i+1).padStart(2,'0')}</span><div><small>{c.level}</small><h2>{c.title}</h2></div></div><h3>如何理解</h3><p>{c.meaning}</p><div className="analysis-next"><b>就诊时确认</b><p>{c.next_step}</p></div><details><summary>展开报告事实与具体数值</summary>{c.facts.map((f,j)=><p className="analysis-fact" key={j}>{f}</p>)}</details><div className="analysis-sources">{c.sources.map(id=>{let r=data.reports.find(r=>r.id===id);return r&&<button key={id} onClick={()=>open(r)}>{r.filename} · 第{r.number}页 ↗</button>})}</div>{c.references.length>0&&<div className="medical-references">医学依据：{c.references.map(id=>{let r=a.references.find(r=>r.id===id);return r&&<a key={id} href={r.url} target="_blank" rel="noreferrer">{r.title}</a>})}</div>}</section>)}</div><section><h2>当前分析的缺口</h2>{a.limitations.map(s=><p key={s}>{s}</p>)}<button onClick={ask}>打开病历问答，讨论具体问题</button></section></>
+}
